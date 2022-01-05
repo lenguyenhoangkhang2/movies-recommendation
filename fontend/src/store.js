@@ -13,4 +13,9 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(...middleware))
 );
 
+store.subscribe(() => {
+  localStorage.setItem("access", store.getState().auth.access);
+  localStorage.setItem("refresh", store.getState().auth.refresh);
+});
+
 export default store;

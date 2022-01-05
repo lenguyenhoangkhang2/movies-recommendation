@@ -9,6 +9,7 @@ import Signup from "./containers/Signup";
 import Activate from "./containers/Activate";
 import ResetPassword from "./containers/ResetPassword";
 import ResetPasswordConfirm from "./containers/ResetPasswordConfirm";
+import { injectStore } from "./api/axiosClient";
 
 const App = () => {
   return (
@@ -23,7 +24,7 @@ const App = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/password/reset/confirm/:uid/:token"
-              component={ResetPasswordConfirm}
+              element={<ResetPasswordConfirm />}
             />
           </Routes>
         </Layout>
@@ -31,5 +32,7 @@ const App = () => {
     </Provider>
   );
 };
+
+injectStore(store);
 
 export default App;

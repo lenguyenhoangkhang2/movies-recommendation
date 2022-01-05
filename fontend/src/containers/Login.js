@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../actions/auth";
 
 const Login = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,6 +21,10 @@ const Login = () => {
     dispatch(login(formData.email, formData.password));
   };
 
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+
   // Is the user authenticated ?
   return (
     <div>
@@ -31,7 +37,7 @@ const Login = () => {
             type="email"
             placeholder="Email"
             name="email"
-            value={FormData.email}
+            value={formData.email}
             onChange={(e) => onChange(e)}
             required
           />
@@ -42,7 +48,7 @@ const Login = () => {
             type="password"
             placeholder="Password"
             name="password"
-            value={FormData.password}
+            value={formData.password}
             onChange={(e) => onChange(e)}
             required
           />

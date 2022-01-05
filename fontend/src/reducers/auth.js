@@ -3,6 +3,14 @@ import {
   LOGIN_FAIL,
   USER_LOADED_SUCCESS,
   USER_LOADED_FAIL,
+  AUTHENTICATED_SUCCESS,
+  AUTHENTICATED_FAIL,
+  LOGOUT,
+  PASSWORD_RESET_SUCCESS,
+  PASSWORD_RESET_FAIL,
+  PASSWORD_RESET_CONFIRM_FAIL,
+  PASSWORD_RESET_CONFIRM_SUCCESS,
+  // REFRESH_AUTH,
 } from "../actions/types";
 
 const initialState = {
@@ -16,8 +24,17 @@ const authReducer = (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
+    case AUTHENTICATED_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: true,
+      };
+    case AUTHENTICATED_FAIL:
+      return {
+        ...state,
+        isAuthenticated: false,
+      };
     case LOGIN_SUCCESS:
-      localStorage.setItem("access", payload.access);
       return {
         ...state,
         isAuthenticated: true,
@@ -29,14 +46,18 @@ const authReducer = (state = initialState, action) => {
         ...state,
         user: payload,
       };
+    // case REFRESH_AUTH:
+    //   return {
+    //     ...state,
+    //     access: payload,
+    //   };
     case USER_LOADED_FAIL:
       return {
         ...state,
         user: null,
       };
+    case LOGOUT:
     case LOGIN_FAIL:
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
       return {
         ...state,
         access: null,

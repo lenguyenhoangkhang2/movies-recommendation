@@ -1,36 +1,31 @@
-import axios from "axios";
+import authApi from "../api/authApi";
 import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   USER_LOADED_SUCCESS,
   USER_LOADED_FAIL,
+  LOGOUT,
+  AUTHENTICATED_FAIL,
+  AUTHENTICATED_SUCCESS,
+  PASSWORD_RESET_FAIL,
+  PASSWORD_RESET_SUCCESS,
 } from "../actions/types";
 
-const apiUrl = process.env.REACT_APP_API_URL;
-
-export const load_user = () => async (dispatch) => {
-  if (localStorage.getItem("access")) {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `JWT ${localStorage.getItem("access")}`,
-        Accept: "application/json",
-      },
-    };
-
-    try {
-      const res = await axios.get(`${apiUrl}/auth/users/me/`, config);
-
-      dispatch({
-        type: USER_LOADED_SUCCESS,
-        payload: res.data,
-      });
-    } catch (err) {
-      dispatch({
-        type: USER_LOADED_FAIL,
-      });
+export const load_user = () => async (dispatch, getState) => {
+  try {
+    const { authenticated } = getState().auth;
+    if (authenticated) {
+      throw new Error();
     }
-  } else {
+
+    const data = await authApi.getuser();
+
+    dispatch({
+      type: USER_LOADED_SUCCESS,
+      payload: data,
+    });
+  } catch (err) {
+    console.log(err);
     dispatch({
       type: USER_LOADED_FAIL,
     });
@@ -39,21 +34,77 @@ export const load_user = () => async (dispatch) => {
 
 export const login = (email, password) => async (dispatch) => {
   try {
-    console.log(process.env.API_URL);
-    const res = await axios.post(`${apiUrl}/auth/jwt/create/`, {
-      email,
-      password,
-    });
+    const data = await authApi.login(email, password);
 
     dispatch({
       type: LOGIN_SUCCESS,
-      payload: res.data,
+      payload: data,
     });
 
     dispatch(load_user());
   } catch (err) {
+    console.log(err);
     dispatch({
       type: LOGIN_FAIL,
     });
   }
+};
+
+export const checkAuthenticated = () => async (state, dispatch) => {
+  try {
+    const token = state.getState().auth.access;
+
+    if (!token) {
+      throw new Error();
+    }
+
+    const data = await authApi.checkAuth(token);
+
+    if (data.code !== "token_not_valid") {
+      dispatch();
+      dispatch({
+        type: AUTHENTICATED_SUCCESS,
+      });
+    } else {
+      throw new Error("Token Not Valid");
+    }
+  } catch (err) {
+    console.log(err);
+    dispatch({
+      type: AUTHENTICATED_FAIL,
+    });
+  }
+};
+
+// export const refreshAccessToken = () => async (state, dispatch) => {
+//   try {
+//     const refreshToken = state.getState().auth.refresh;
+
+//     if (!refreshToken) {
+//       throw new Error("Refresh token not exists");
+//     }
+
+//     const data = await authApi.refreshAuth(refreshToken);
+
+//     if (data.code !== "token_not_valid") {
+//       dispatch({
+//         type: REFRESH_AUTH,
+//         payload: data,
+//       });
+//     } else {
+//       throw new Error("Token Not Valid");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     dispatch({
+//       type: AUTHENTICATED_FAIL,
+//     });
+//   }
+// };
+
+export const logout = () => (dispatch) => {
+  console.log("chay vao logout");
+  dispatch({
+    type: LOGOUT,
+  });
 };
