@@ -1,9 +1,12 @@
 import axiosClient from "./axiosClient";
 
-const getuser = () => {
-  console.log("day chay vao day");
+const getuser = (access) => {
   const url = "/auth/users/me/";
-  return axiosClient.get(url);
+  return axiosClient.get(url, {
+    headers: {
+      Authorization: `JWT ${access}`,
+    },
+  });
 };
 
 const login = (email, password) => {

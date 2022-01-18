@@ -42,8 +42,6 @@ const Signup = () => {
     }
   };
 
-  console.log(success, error);
-
   if (isAuthenticated) {
     return <Navigate to="/" />;
   }

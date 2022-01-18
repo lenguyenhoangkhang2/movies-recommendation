@@ -5,6 +5,7 @@ import { logout } from "../actions/auth.js";
 
 function Navbar() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   const guestLinks = () => (
@@ -23,19 +24,32 @@ function Navbar() {
   );
 
   const authLinks = () => (
-    <li className="nav-item">
-      <Link className="nav-link" to="/" onClick={() => dispatch(logout())}>
-        Logout
-      </Link>
-    </li>
+    <>
+      {user ? (
+        <li className="nav-item">
+          <Link className="nav-link" to="/profile" onClick={() => {}}>
+            <strong>{user.name}</strong>
+          </Link>
+        </li>
+      ) : null}
+      <li className="nav-item">
+        <Link
+          className="nav-link"
+          to="/home"
+          onClick={() => dispatch(logout())}
+        >
+          Logout
+        </Link>
+      </li>
+    </>
   );
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-            Movies Recommendation
+      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div className="container">
+          <Link className="navbar-brand" to="/home">
+            <strong>Movies Recommendation</strong>
           </Link>
           <button
             className="navbar-toggler"
@@ -59,6 +73,10 @@ function Navbar() {
                   Home
                 </Link>
               </li>
+            </ul>
+          </div>
+          <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
+            <ul className="navbar-nav ms-auto">
               {isAuthenticated ? authLinks() : guestLinks()}
             </ul>
           </div>

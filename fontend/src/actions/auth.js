@@ -13,24 +13,36 @@ import {
 
 export const load_user = () => async (dispatch, getState) => {
   try {
-    const { authenticated } = getState().auth;
-    if (authenticated) {
+    const { isAuthenticated, access } = getState().auth;
+
+    if (!isAuthenticated && !access) {
+      dispatch({
+        type: USER_LOADED_FAIL,
+      });
       throw new Error();
     }
 
-    const data = await authApi.getuser();
+    const data = await authApi.getuser(access);
 
     dispatch({
       type: USER_LOADED_SUCCESS,
       payload: data,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     dispatch({
       type: USER_LOADED_FAIL,
     });
   }
 };
+
+// export const auth_load_user = () => async (dispatch, getState) => {
+//   try {
+//     const {auth}
+//   } catch (err) {
+//
+//   }
+// }
 
 export const login = (email, password) => async (dispatch) => {
   try {
@@ -50,9 +62,9 @@ export const login = (email, password) => async (dispatch) => {
   }
 };
 
-export const checkAuthenticated = () => async (state, dispatch) => {
+export const checkAuthenticated = () => async (dispatch, getState) => {
   try {
-    const token = state.getState().auth.access;
+    const token = getState().auth.access;
 
     if (!token) {
       throw new Error();
@@ -61,7 +73,6 @@ export const checkAuthenticated = () => async (state, dispatch) => {
     const data = await authApi.checkAuth(token);
 
     if (data.code !== "token_not_valid") {
-      dispatch();
       dispatch({
         type: AUTHENTICATED_SUCCESS,
       });
@@ -103,7 +114,6 @@ export const checkAuthenticated = () => async (state, dispatch) => {
 // };
 
 export const logout = () => (dispatch) => {
-  console.log("chay vao logout");
   dispatch({
     type: LOGOUT,
   });

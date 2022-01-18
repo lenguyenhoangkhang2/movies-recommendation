@@ -9,9 +9,12 @@ import {
   // REFRESH_AUTH,
 } from "../actions/types";
 
+const access = localStorage.getItem("access");
+const refresh = localStorage.getItem("refresh");
+
 const initialState = {
-  access: localStorage.getItem("access"),
-  refresh: localStorage.getItem("refresh"),
+  access: access === "null" ? null : access,
+  refresh: refresh === "null" ? null : refresh,
   isAuthenticated: null,
   user: null,
 };
