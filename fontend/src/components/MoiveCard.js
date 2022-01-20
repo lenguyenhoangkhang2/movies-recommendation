@@ -2,11 +2,16 @@ import React from "react";
 import { Button, Card } from "react-bootstrap";
 
 const MovieCard = ({ movie, setShowDetail, setMovieDetailId }) => {
+  console.log(movie);
   return (
     <Card>
       <Card.Header>
         <h5>{movie.title}</h5>
       </Card.Header>
+      <Card.Img
+        variant="top"
+        src={`http://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+      />
       <Card.Body>
         <p>
           <strong>

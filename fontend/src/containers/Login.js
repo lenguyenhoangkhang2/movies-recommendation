@@ -60,10 +60,6 @@ const Login = () => {
           <Button className="mt-3 w-100" type="submit" variant="primary">
             <strong>Login</strong>
           </Button>
-
-          <Alert className="mt-3 text-center text-capitalize" variant="danger">
-            Email or password is incorrect
-          </Alert>
         </Form>
       </Col>
     </Row>

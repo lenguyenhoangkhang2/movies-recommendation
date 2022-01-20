@@ -119,7 +119,14 @@ const MovieDetail = ({ movieId, setShow, setMovieId }) => {
       </Modal.Header>
       <Modal.Body>
         <Row>
-          <Col>
+          <Col md={6}>
+            <img
+              className="rounded img-fluid"
+              src={`http://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+              alt={`${movie.title}-poster`}
+            />
+          </Col>
+          <Col md={6}>
             <p>
               <strong>Release: </strong>
               <span>{release_date ? release_date : "Nan"}</span>
@@ -140,8 +147,6 @@ const MovieDetail = ({ movieId, setShow, setMovieId }) => {
               <strong>Popularity: </strong>
               <span>{popularity}</span>
             </p>
-          </Col>
-          <Col>
             <p>
               <strong>Genre: </strong>
               <span>{_.join(genres, ", ")}</span>
@@ -150,22 +155,16 @@ const MovieDetail = ({ movieId, setShow, setMovieId }) => {
               <strong>Keywords: </strong>
               <span>{_.join(keywords, ", ")}</span>
             </p>
-          </Col>
-        </Row>
-      </Modal.Body>
-      <Modal.Body style={{ borderTop: "1px solid #dee2e6" }}>
-        <Row>
-          <Col>
             <h5>Tagline</h5>
             <p>{tagline ? tagline : "Nan"}</p>
             <h5>Overview</h5>
             <p>{overview ? overview : "Nan"}</p>
           </Col>
-          <Col>
-            <h5>Similar Movies</h5>
-            {renderSimilarities}
-          </Col>
         </Row>
+      </Modal.Body>
+      <Modal.Body style={{ borderTop: "1px solid #dee2e6" }}>
+        <h5>Similar Movies</h5>
+        {renderSimilarities}
       </Modal.Body>
       {isAuthenticated ? renderMyRating() : ""}
     </Modal>

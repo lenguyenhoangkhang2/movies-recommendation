@@ -50,7 +50,7 @@ const UserPage = () => {
     );
   }, [ownerRatings]);
 
-  const renderRecommendations = useMemo(() => {
+  const renderRecommendations = () => {
     if (recommedations.length) {
       return (
         <Row className="g-4 mt-3">
@@ -66,7 +66,7 @@ const UserPage = () => {
         </Row>
       );
     }
-  }, [recommedations]);
+  };
 
   return (
     <div>
@@ -90,7 +90,7 @@ const UserPage = () => {
               ? "Re-Show Recommendations"
               : "Show Recommedations"}
           </Button>
-          {renderRecommendations}
+          {renderRecommendations()}
         </>
       )}
     </div>

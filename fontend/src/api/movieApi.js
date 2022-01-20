@@ -1,5 +1,4 @@
 import axiosClient from "./axiosClient";
-
 const getMovies = (params) => {
   const url = "api/movies/";
   return axiosClient.get(url, {
@@ -52,6 +51,11 @@ const getMovieRecommendations = () => {
   return axiosClient.get(url);
 };
 
+const getTmdbMovieById = (id) => {
+  const url = `https://api.themoviedb.org/3/movie/${id}?api_key=f3c3a6bc32ae3bd3136a5ff18ece513e`;
+  return axiosClient.get(url);
+};
+
 const movieApi = {
   getMovies,
   getGenres,
@@ -61,6 +65,7 @@ const movieApi = {
   postRatingMovie,
   getOwnerRatings,
   getMovieRecommendations,
+  getTmdbMovieById,
 };
 
 export default movieApi;

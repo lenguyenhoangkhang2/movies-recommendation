@@ -18,13 +18,23 @@ import _ from "lodash";
 export const load_movies = (params) => async (dispatch) => {
   try {
     const data = await movieApi.getMovies(params);
-    data.results.map((movie) => (movie.show = true));
+
+    await Promise.all(
+      data.results.map(async (movie) => {
+        const { poster_path } = await movieApi.getTmdbMovieById(movie.id);
+        movie.show = true;
+        movie.poster_path = poster_path;
+      })
+    );
+    // payload = data.results.map((movie) => (movie.show = true));
+    // console.log(data);
 
     dispatch({
       type: LOAD_MOVIES,
       payload: data,
     });
   } catch (err) {
+    console.log(err);
     dispatch({ type: LOAD_MOVIES_FAIL });
   }
 };
@@ -42,7 +52,13 @@ export const change_movies_page = (pageCount) => async (dispatch, getState) => {
 
   try {
     const data = await axiosClient.get(new_url);
-    data.results.map((movie) => (movie.show = true));
+    await Promise.all(
+      data.results.map(async (movie) => {
+        const { poster_path } = await movieApi.getTmdbMovieById(movie.id);
+        movie.show = true;
+        movie.poster_path = poster_path;
+      })
+    );
 
     dispatch({
       type: LOAD_MOVIES,
@@ -60,26 +76,35 @@ export const load_similar_and_check_rated =
       const isAuthenticated = getState().auth.isAuthenticated;
 
       let data = await movieApi.getSimilarMovies(movieId);
+
       const ids = data.map(({ id }) => id);
 
-      data = _.unionBy(movies, data, "id").filter((movie) => {
-        if (ids.includes(movie.id)) {
-          movie.similarId = movie.similarId
-            ? [...movie.similarId, movieId]
-            : [movieId];
-        }
+      data = _.unionBy(movies, data, "id");
 
-        return movie;
-      });
+      data = await Promise.all(
+        data.map(async (movie) => {
+          if (ids.includes(movie.id)) {
+            movie.similarId = movie.similarId
+              ? [...movie.similarId, movieId]
+              : [movieId];
+
+            const { poster_path } = await movieApi.getTmdbMovieById(movie.id);
+
+            movie.poster_path = poster_path;
+          }
+
+          return movie;
+        })
+      );
+      console.log(data);
 
       dispatch({ type: ADD_MOVIES, payload: data });
 
       if (isAuthenticated) {
         dispatch(check_rated_by_user(movieId));
       }
-    } catch (err) {
       dispatch({ type: LOAD_MOVIES_FAIL });
-    }
+    } catch (err) {}
   };
 
 export const check_rated_by_user = (movieId) => async (dispatch, getState) => {
@@ -113,13 +138,17 @@ export const load_recommendations = () => async (dispatch, getState) => {
 
     const ids = data.map(({ id }) => id);
 
-    const payload = _.unionBy(movies, data, "id").filter((movie) => {
-      if (ids.includes(movie.id)) {
-        movie.isRecommend = true;
-      }
+    const payload = await Promise.all(
+      _.unionBy(movies, data, "id").map(async (movie) => {
+        if (ids.includes(movie.id)) {
+          movie.isRecommend = true;
+          const { poster_path } = await movieApi.getTmdbMovieById(movie.id);
+          movie.poster_path = poster_path;
+        }
 
-      return movie;
-    });
+        return movie;
+      })
+    );
 
     dispatch({
       type: LOAD_RECOMMENDATIONS,
@@ -137,13 +166,19 @@ export const load_owner_ratings = () => async (dispatch) => {
   try {
     const data = await movieApi.getOwnerRatings();
 
-    const payload = data.map(({ movie, rating }) => ({
-      ...movie,
-      my_rating: {
-        is_rated: true,
-        rating: rating,
-      },
-    }));
+    const payload = await Promise.all(
+      data.map(async ({ movie, rating }) => {
+        const { poster_path } = await movieApi.getTmdbMovieById(movie.id);
+        return {
+          ...movie,
+          my_rating: {
+            is_rated: true,
+            rating: rating,
+          },
+          poster_path,
+        };
+      })
+    );
 
     dispatch({
       type: LOAD_OWNER_RATINGS,
